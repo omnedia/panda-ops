@@ -5,7 +5,6 @@ export class GitHubAdapter implements VCSAdapter {
     constructor(private cfg: AppConfig) {
     }
 
-    // ✅ Fetch the unified diff for the PR (works for private/public repos)
     async getDiff(): Promise<string> {
         const url = `https://api.github.com/repos/${this.cfg.repository}/pulls/${this.cfg.pullRequestId}`;
         const res = await axios.get(url, {
@@ -17,8 +16,7 @@ export class GitHubAdapter implements VCSAdapter {
         });
         return res.data;
     }
-
-    // ✅ Post a plain summary comment to the PR
+    
     async postComment(message: string): Promise<void> {
         const url = `https://api.github.com/repos/${this.cfg.repository}/issues/${this.cfg.pullRequestId}/comments`;
         await axios.post(

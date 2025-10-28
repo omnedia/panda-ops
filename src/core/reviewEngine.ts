@@ -100,7 +100,6 @@ async function runAI(
         "You are a precise, constructive code review assistant analyzing a unified Git diff.",
         "Each comment must correspond to a file and line if possible.",
         "If no issues are found, return an empty 'comments' array.",
-        "",
         "Respond ONLY with a JSON object matching this schema:",
         `{
           "comments": [
