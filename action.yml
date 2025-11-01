@@ -1,0 +1,112 @@
+name: 'PandaOps AI PR Review'
+description: 'AI-powered pull request analysis'
+author: 'Omnedia'
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  github_token:
+    description: 'GitHub token (for posting comments)'
+    required: true
+  openai_api_key:
+    description: 'OpenAI API key'
+    required: true
+  provider:
+    description: 'VCS provider (github | bitbucket | azure)'
+    default: 'github'
+  repository:
+    description: 'Repository identifier (e.g. owner/name)'
+    default: ${{ github.repository }}
+  pull_request_id:
+    description: 'Pull request ID'
+    default: ${{ github.event.pull_request.number }}
+  api_base:
+    description: 'Custom API base URL'
+    required: false
+
+  # ---- Behavior toggles ----
+  dry_run:
+    description: 'Log output only, do not post comments'
+    required: false
+  output_json:
+    description: 'Output machine-readable JSON instead of formatted logs'
+    required: false
+  fail_on_comments:
+    description: 'Exit with code 2 if comments found'
+    required: false
+  fail_on_warnings:
+    description: 'Request changes if warnings/errors found'
+    required: false
+  ai_enabled:
+    description: 'Enable or disable AI analysis'
+    required: false
+  max_comments:
+    description: 'Maximum number of comments to post'
+    default: '50'
+
+  # ---- AI parameters ----
+  openai_model:
+    description: 'OpenAI model (default: gpt-5-mini)'
+    default: 'gpt-5-mini'
+  openai_temperature:
+    description: 'Sampling temperature (default: 1)'
+    default: '1'
+  openai_max_tokens:
+    description: 'Maximum tokens per completion (default: 1500)'
+    default: '1500'
+
+  # ---- AI focus flags ----
+  ai_focus_errors:
+    description: 'Check for critical and breaking issues'
+    default: 'true'
+  ai_focus_warn:
+    description: 'Check for risky or unstable logic'
+    default: 'true'
+  ai_focus_tips:
+    description: 'Check for readability and maintainability tips'
+    default: 'true'
+  ai_focus_notes:
+    description: 'Include architectural and design notes'
+    default: 'false'
+  ai_focus_grammar:
+    description: 'Check for naming/grammar consistency'
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install PandaOps
+      run: |
+        npm install -g @omnedia/panda-ops
+
+    - name: Run PandaOps Review
+      shell: bash
+      env:
+        PROVIDER: ${{ inputs.provider }}
+        GITHUB_REPOSITORY: ${{ inputs.repository }}
+        GITHUB_PR_ID: ${{ inputs.pull_request_id }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_API_BASE: ${{ inputs.api_base }}
+        OPENAI_API_KEY: ${{ inputs.openai_api_key }}
+        OPENAI_MODEL: ${{ inputs.openai_model }}
+        OPENAI_TEMPERATURE: ${{ inputs.openai_temperature }}
+        OPENAI_MAX_TOKENS: ${{ inputs.openai_max_tokens }}
+        AI_ENABLED: ${{ inputs.ai_enabled }}
+        MAX_COMMENTS: ${{ inputs.max_comments }}
+        DRY_RUN: ${{ inputs.dry_run }}
+        OUTPUT_JSON: ${{ inputs.output_json }}
+        FAIL_ON_COMMENTS: ${{ inputs.fail_on_comments }}
+        FAIL_ON_WARNINGS: ${{ inputs.fail_on_warnings }}
+        AI_FOCUS_ERRORS: ${{ inputs.ai_focus_errors }}
+        AI_FOCUS_WARN: ${{ inputs.ai_focus_warn }}
+        AI_FOCUS_TIPS: ${{ inputs.ai_focus_tips }}
+        AI_FOCUS_NOTES: ${{ inputs.ai_focus_notes }}
+        AI_FOCUS_GRAMMAR: ${{ inputs.ai_focus_grammar }}
+      run: |
+        panda-ops
