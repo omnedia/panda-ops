@@ -5,7 +5,7 @@ export class AzureAdapter implements VCSAdapter {
   constructor(private cfg: AppConfig) {}
 
   async getDiff(): Promise<string> {
-    log.error('[Azure DevOps] Diff retrieval not implemented yet.');
+log.error('[Azure DevOps] Diff retrieval not implemented yet.');
     return new Promise<string>((resolve) => resolve(''));
   }
 
