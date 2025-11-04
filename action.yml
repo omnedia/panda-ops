@@ -82,6 +82,7 @@ runs:
         node-version: 20
 
     - name: Install PandaOps
+      shell: bash
       run: |
         npm install -g @omnedia/panda-ops
 
