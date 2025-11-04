@@ -1,6 +1,6 @@
 {
   "name": "@omnedia/panda-ops",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A TypeScript-based tool that analyzes pull requests and adds AI-generated review comments via the OpenAI API.",
   "type": "module",
   "main": "./main.js",

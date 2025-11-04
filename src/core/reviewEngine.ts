@@ -70,7 +70,6 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
     openaiApiKey,
     openaiModel,
     openaiTemperature,
-    openaiMaxTokens,
     focusErrors = true,
     focusWarn = true,
     focusTips = true,
@@ -183,7 +182,6 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
     const completion = await openai.chat.completions.parse({
       model: openaiModel,
       temperature: openaiTemperature,
-      max_completion_tokens: openaiMaxTokens,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },

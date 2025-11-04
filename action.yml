@@ -52,9 +52,6 @@ inputs:
   openai_temperature:
     description: 'Sampling temperature (default: 1)'
     default: '1'
-  openai_max_tokens:
-    description: 'Maximum tokens per completion (default: 1500)'
-    default: '1500'
 
   # ---- AI focus flags ----
   ai_focus_errors:
@@ -97,7 +94,6 @@ runs:
         OPENAI_API_KEY: ${{ inputs.openai_api_key }}
         OPENAI_MODEL: ${{ inputs.openai_model }}
         OPENAI_TEMPERATURE: ${{ inputs.openai_temperature }}
-        OPENAI_MAX_TOKENS: ${{ inputs.openai_max_tokens }}
         AI_ENABLED: ${{ inputs.ai_enabled }}
         MAX_COMMENTS: ${{ inputs.max_comments }}
         DRY_RUN: ${{ inputs.dry_run }}

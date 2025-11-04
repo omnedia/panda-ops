@@ -134,7 +134,6 @@ async function main(argv: string[]) {
       openaiApiKey: opts.openaiApiKey,
       openaiModel: opts.openaiModel,
       openaiTemperature: opts.openaiTemperature,
-      openaiMaxTokens: opts.openaiMaxTokens,
       aiEnabled: !opts.noAi,
       maxComments: opts.maxComments,
     });
