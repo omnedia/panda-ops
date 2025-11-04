@@ -82,8 +82,9 @@ runs:
         node-version: 20
 
     - name: Install PandaOps
+      shell: bash
       run: |
-        npm install -g @omnedia/panda-ops
+        npm install @omnedia/panda-ops
 
     - name: Run PandaOps Review
       shell: bash
@@ -109,4 +110,4 @@ runs:
         AI_FOCUS_NOTES: ${{ inputs.ai_focus_notes }}
         AI_FOCUS_GRAMMAR: ${{ inputs.ai_focus_grammar }}
       run: |
-        panda-ops
+        npx panda-ops
