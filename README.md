@@ -103,7 +103,6 @@ jobs:
 | `max_comments`       | Max number of comments                        | `50`                                      |
 | `openai_model`       | Model name                                    | `gpt-5-mini`                              |
 | `openai_temperature` | Sampling temperature                          | `1`                                       |
-| `openai_max_tokens`  | Max tokens per completion                     | `1500`                                    |
 | `ai_focus_errors`    | Detect critical/breaking issues               | `true`                                    |
 | `ai_focus_warn`      | Detect risky logic                            | `true`                                    |
 | `ai_focus_tips`      | Suggest maintainability improvements          | `true`                                    |
