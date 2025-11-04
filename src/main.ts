@@ -16,6 +16,7 @@ dotenv.config();
 function createAdapter(cfg: AppConfig): VCSAdapter {
   switch (cfg.provider) {
     case 'github':
+      console.log("GITHUB");
       return new GitHubAdapter(cfg);
     case 'bitbucket':
       return new BitbucketAdapter(cfg);
@@ -27,7 +28,7 @@ function createAdapter(cfg: AppConfig): VCSAdapter {
 }
 
 async function execute(cfg: PandaOpsConfig) {
-  const adapter = createAdapter(cfg);
+  const adapter = createAdapter(cfg)
 
   try {
     log.info('[PandaOps] Fetching PR diff...');
