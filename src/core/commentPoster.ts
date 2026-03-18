@@ -14,11 +14,7 @@ function summarizeResult(result: ReviewResult, cfg: PandaOpsConfig) {
   const hasErrors = errors > 0;
   const hasWarns = warns > 0;
   const status =
-    cfg.failOnWarnings && (hasErrors || hasWarns)
-      ? 'CHANGES_REQUESTED'
-      : hasErrors
-        ? 'CHANGES_REQUESTED'
-        : 'APPROVED';
+    cfg.failOnWarnings && (hasErrors || hasWarns) ? 'CHANGES_REQUESTED' : hasErrors ? 'CHANGES_REQUESTED' : 'APPROVED';
 
   const hasIssues = status === 'CHANGES_REQUESTED';
 
@@ -40,11 +36,7 @@ function formatSummary(result: ReviewResult, cfg: PandaOpsConfig): string {
   const stats = summarizeResult(result, cfg);
 
   if (stats.total === 0) {
-    return [
-      '### 🐼 PandaOps Automated Review Summary',
-      '',
-      '✅ **No issues found — looks great!** 🎉',
-    ].join('\n');
+    return ['### 🐼 PandaOps Automated Review Summary', '', '✅ **No issues found — looks great!** 🎉'].join('\n');
   }
 
   const lines = ['### 🐼 PandaOps Summary', '', `**Comments:** ${stats.total}`];
@@ -55,12 +47,7 @@ function formatSummary(result: ReviewResult, cfg: PandaOpsConfig): string {
   if (cfg.focusNotes) lines.push(`- 📝 Notes: ${stats.notes}`);
   if (cfg.focusGrammar) lines.push(`- ✏️ Grammar: ${stats.grammar}`);
 
-  lines.push(
-    '',
-    stats.hasIssues
-      ? '🚫 **Review Result:** Changes Requested'
-      : '✅ **Review Result:** Approved',
-  );
+  lines.push('', stats.hasIssues ? '🚫 **Review Result:** Changes Requested' : '✅ **Review Result:** Approved');
 
   return lines.join('\n');
 }
@@ -94,11 +81,7 @@ export function formatSummaryCLI(result: ReviewResult, cfg: PandaOpsConfig): str
     `;
 }
 
-export async function postReview(
-  adapter: VCSAdapter,
-  result: ReviewResult,
-  cfg: PandaOpsConfig,
-): Promise<void> {
+export async function postReview(adapter: VCSAdapter, result: ReviewResult, cfg: PandaOpsConfig): Promise<void> {
   log.info('[PandaOps] Posting inline and summary comments...');
 
   const summary = formatSummary(result, cfg);
@@ -115,10 +98,7 @@ export async function postReview(
         try {
           await adapter.postInlineComment(c.file, c.line, beautifyTagPrefix(c.message));
         } catch (err) {
-          log.warn(
-            { err },
-            `[PandaOps] Failed to post inline comment at ${c.file}:${c.line}`,
-          );
+          log.warn({ err }, `[PandaOps] Failed to post inline comment at ${c.file}:${c.line}`);
         }
       }
     }

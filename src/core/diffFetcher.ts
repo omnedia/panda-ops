@@ -9,8 +9,6 @@ export async function fetchDiff(adapter: VCSAdapter): Promise<string> {
     return diff.replace(/\r\n/g, '\n');
   } catch (err) {
     log.error(err, 'Failed to fetch diff');
-    throw new Error(
-      'Failed to fetch diff: ' + (err instanceof Error ? err.message : String(err)),
-    );
+    throw new Error('Failed to fetch diff: ' + (err instanceof Error ? err.message : String(err)));
   }
 }

@@ -1,12 +1,15 @@
 # PandaOps - GitHub Copilot Instructions
 
 ## Project Overview
+
 PandaOps is an AI-powered Pull Request reviewer that behaves like a strong first-pass senior reviewer. It reads a PR, understands the changed code in repository context, produces a clear summary, walkthrough, and architecture diagram, then posts high-signal inline review comments only when there is a concrete, actionable issue.
 
 It's a TypeScript-based CLI tool and GitHub Action that uses OpenAI models with a structured review pipeline to generate intelligent, context-aware code reviews and posts them directly to GitHub, Bitbucket, or Azure DevOps.
 
 ### Design Philosophy
+
 The system is **not** a single "ask the LLM to review this PR" step. It's a **structured pipeline** with distinct phases for quality, scale, and noise control. The reviewer should:
+
 - **Summarize first, then inspect deeply**
 - **Prefer concrete bugs over opinions**
 - **Explain runtime impact**
@@ -16,7 +19,9 @@ The system is **not** a single "ask the LLM to review this PR" step. It's a **st
 - **Be deterministic and configurable**
 
 ### Final Product Goals
+
 The final system produces:
+
 - ✅ **TL;DR summary** of the PR
 - ✅ **Walkthrough** of the main changes grouped by theme/subsystem
 - ✅ **Architectural/data-flow diagram** (Mermaid) showing affected components
@@ -26,12 +31,14 @@ The final system produces:
 - ✅ **YAML-driven customization** for coding guidelines, scope, thresholds, and workflow behavior
 
 The target outcome is a PR review bot that:
+
 - Catches meaningful bugs
 - Explains what changed
 - Reduces reviewer load
 - Scales well to very large diffs without becoming noisy or useless
 
 ## Tech Stack
+
 - **Language**: TypeScript (ES Modules)
 - **Runtime**: Node.js >= 20.0.0
 - **Key Dependencies**:
@@ -43,11 +50,12 @@ The target outcome is a PR review bot that:
   - `dotenv` - Environment variable management
   - `js-yaml` - YAML configuration parsing
   - `simple-git` - Repository context retrieval
-  - *(Planned)* Mermaid generation for architecture diagrams
+  - _(Planned)_ Mermaid generation for architecture diagrams
 
 ## Architecture
 
 ### Project Structure
+
 ```
 src/
 ├── main.ts              # CLI entrypoint, command parsing, orchestration
@@ -79,6 +87,7 @@ src/
 ```
 
 ### Key Patterns
+
 - **Adapter Pattern**: VCS providers implement a common `VCSAdapter` interface
 - **Pipeline Pattern**: Review process is a multi-stage pipeline with clear separation of concerns
 - **Strategy Pattern**: Large PR handling switches between detailed and hotspot-focused strategies
@@ -91,6 +100,7 @@ src/
 ## Code Style & Conventions
 
 ### TypeScript
+
 - Use ES modules syntax (`import/export`)
 - Always include `.js` extension in imports (TypeScript requirement for ES modules)
 - Prefer explicit types over `any`
@@ -98,18 +108,21 @@ src/
 - Use interfaces for configuration objects
 
 ### Naming
+
 - File names: camelCase for source files (e.g., `reviewEngine.ts`)
 - Exported functions: camelCase (e.g., `runReview`, `fetchDiff`)
 - Classes: PascalCase with "Adapter" suffix (e.g., `GitHubAdapter`)
 - Constants: UPPER_SNAKE_CASE for environment variables
 
 ### Error Handling
+
 - Use try-catch blocks for async operations
 - Log errors with `log.error()`
 - Provide meaningful error messages
 - Exit with appropriate codes: 0 (success), 1 (error), 2 (fail-on-comments)
 
 ### Logging
+
 - Use `log` from `./core/logger.js`
 - Prefix messages with `[PandaOps]` for user-facing logs
 - Use appropriate log levels: `debug`, `info`, `warn`, `error`
@@ -117,6 +130,7 @@ src/
 ## Domain Concepts
 
 ### Review Workflow
+
 The system follows a **structured pipeline** (not a single LLM call):
 
 1. **Config Loading**: Parse CLI args/env vars, load YAML config, validate with Zod
@@ -129,7 +143,7 @@ The system follows a **structured pipeline** (not a single LLM call):
 8. **PR Planning**: Determine review strategy (detailed vs. hotspot-focused) based on PR size
 9. **Summary Generation**: Create TL;DR, walkthrough, key risks, test impact
 10. **Architecture Extraction**: Generate Mermaid diagram of affected components and data flow
-11. **Line Review Passes**: 
+11. **Line Review Passes**:
     - Run heuristic checks (TODOs, console.log, debugger, etc.)
     - Run AI analysis using OpenAI on high-risk areas (if enabled)
 12. **Finding Validation**: Validate findings for accuracy and actionability
@@ -139,6 +153,7 @@ The system follows a **structured pipeline** (not a single LLM call):
 16. **Incremental Reconciliation**: Track reviewed state for future updates
 
 ### Configuration
+
 - **AppConfig**: VCS provider, repository, PR ID, auth token, API base URL
 - **AIConfig**: OpenAI settings (model, temperature, enabled flag, max comments)
 - **AIBehaviorConfig**: Focus flags (errors, warnings, tips, notes, grammar)
@@ -154,10 +169,11 @@ The system follows a **structured pipeline** (not a single LLM call):
   - `customRules`: Project-specific heuristics and patterns to check
 
 ### Review Comments
+
 - **Source**: `'heuristic'` or `'ai'`
 - **Severity**: `'ERROR'`, `'WARN'`, `'TIP'`, `'NOTE'`
 - **Message**: Human-readable feedback
-- **Optional fields**: 
+- **Optional fields**:
   - `file`: Path to the affected file
   - `line`: Exact line number in the diff
   - `suggestion`: Proposed code fix
@@ -166,7 +182,9 @@ The system follows a **structured pipeline** (not a single LLM call):
   - `impact`: Expected runtime impact explanation
 
 ### Heuristic Rules
+
 Built-in checks for:
+
 - TODO/FIXME comments
 - console.log statements
 - debugger statements
@@ -174,7 +192,9 @@ Built-in checks for:
 - Large diffs (>500 added lines)
 
 ### Finding Categories (Prioritized)
+
 High-value findings that should be surfaced:
+
 - **Correctness issues**: Logic bugs, null pointer risks, type mismatches
 - **Security issues**: SQL injection, XSS, insecure authentication, exposed secrets
 - **Performance regressions**: N+1 queries, inefficient algorithms, memory leaks
@@ -183,26 +203,31 @@ High-value findings that should be surfaced:
 - **Missing test coverage**: Risky logic without tests
 
 Low-value findings that should be suppressed:
+
 - Style noise (formatting, whitespace)
 - Weak speculation without concrete evidence
 - Duplicate or redundant comments
 - Subjective opinions without clear benefit
 
 ### Large PR Handling Strategy
+
 The system must adapt its review approach based on PR size:
 
 **Small/Medium PRs (< 500 lines changed)**:
+
 - Perform detailed line-by-line review
 - Generate comprehensive inline comments
 - Full AI analysis on all changed code
 
 **Large PRs (500-2000 lines changed)**:
+
 - Cluster changes by subsystem/module
 - Summarize each cluster
 - Focus AI analysis on high-risk files
 - Batch low-risk mechanical changes
 
 **Huge PRs (> 2000 lines changed)**:
+
 - Generate high-level summary only
 - Identify top 10-20% hotspots by risk score
 - Deep review only critical/high-risk areas
@@ -211,6 +236,7 @@ The system must adapt its review approach based on PR size:
 - Recommend splitting the PR if possible
 
 **Risk Scoring Factors**:
+
 - File complexity (cyclomatic complexity, nesting depth)
 - Change size (lines added/deleted)
 - File type (core logic vs. config/generated)
@@ -222,6 +248,7 @@ The system must adapt its review approach based on PR size:
 ## AI Integration
 
 ### OpenAI Usage
+
 - Default model: `gpt-5-mini`
 - Uses structured output with Zod schema (`ReviewResponseSchema`)
 - Focus flags control what AI should look for:
@@ -232,12 +259,15 @@ The system must adapt its review approach based on PR size:
   - `focusGrammar`: Naming/spelling consistency
 
 ### Prompt Engineering
+
 - System prompt includes focus flags and instructions
 - Diff is provided with line numbers
 - AI returns structured JSON with comments array
 
 ### PR Summary Generation
+
 The AI generates a comprehensive summary including:
+
 - **TL;DR**: One-sentence description of the PR's purpose
 - **Walkthrough**: Grouped explanations of major changes by subsystem/theme
 - **Key Risks**: Highlighted areas that need careful review
@@ -245,7 +275,9 @@ The AI generates a comprehensive summary including:
 - **Dependencies**: New dependencies or version updates introduced
 
 ### Architecture Diagram Generation
+
 The system extracts structural information and generates a Mermaid diagram showing:
+
 - **Affected Components**: Modules, services, classes changed by the PR
 - **Data Flow**: How data moves through the changed components
 - **Control Flow**: Key interactions and dependencies
@@ -257,6 +289,7 @@ The diagram should be compact, focused on the PR scope, and avoid showing the en
 ## VCS Adapters
 
 ### Common Interface (VCSAdapter)
+
 ```typescript
 interface VCSAdapter {
   fetchDiff(): Promise<string>;
@@ -265,6 +298,7 @@ interface VCSAdapter {
 ```
 
 ### Supported Providers
+
 - **GitHub**: Uses REST API v3, requires `repo` scope
 - **Bitbucket**: Uses REST API 2.0
 - **Azure DevOps**: Uses Azure DevOps REST API
@@ -272,11 +306,13 @@ interface VCSAdapter {
 ## Testing & Development
 
 ### Build Commands
+
 - `npm run build` - Compile TypeScript to `dist/`
 - `npm run dev` - Run with ts-node
 - `npm run start` - Execute compiled version
 
 ### Linting
+
 - Uses ESLint with TypeScript parser
 - Prettier for formatting
 - Run `npm run lint` or `npm run lint:fix`
@@ -284,6 +320,7 @@ interface VCSAdapter {
 ## GitHub Action Usage
 
 ### Key Inputs
+
 - `github_token`: Required for posting comments
 - `openai_api_key`: Required for AI analysis
 - `provider`: VCS type (github/bitbucket/azure)
@@ -291,28 +328,33 @@ interface VCSAdapter {
 - `ai_focus_*`: Control AI behavior
 
 ### Environment Variables
+
 Maps action inputs to environment variables consumed by CLI.
 
 ## Important Notes
 
 ### For Code Changes
+
 - Always maintain ES module compatibility (`.js` imports)
 - Update both CLI and GitHub Action when adding features
 - Validate config changes with Zod schemas
 - Test with multiple VCS providers if changing adapters
 
 ### For New Features
+
 - Add CLI option in `main.ts` using Commander
 - Add corresponding GitHub Action input in `action.yml`
 - Update config schema in `config.ts`
 - Document in README.md
 
 ### Performance Considerations
+
 - Limit AI token usage (respect `maxComments`)
 - Handle large diffs gracefully
 - Use streaming/pagination for large PRs
 
 ### Security
+
 - Never log API keys or tokens
 - Sanitize diff content before sending to OpenAI
 - Validate all external inputs with Zod
@@ -320,23 +362,27 @@ Maps action inputs to environment variables consumed by CLI.
 ## Common Tasks
 
 ### Adding a New Heuristic Rule
+
 Edit `src/core/reviewEngine.ts` in the `runHeuristic()` function.
 
 ### Adding a New VCS Provider
+
 1. Create adapter in `src/adapters/`
 2. Implement `VCSAdapter` interface
 3. Add to `createAdapter()` in `src/main.ts`
 4. Update `Provider` type in `src/config.ts`
 
 ### Modifying AI Behavior
+
 Adjust system prompt in `src/core/reviewEngine.ts` `runAI()` function.
 
 ### Changing Output Format
+
 Edit `src/core/commentPoster.ts` functions.
 
 ## Package Distribution
+
 - Published as `@omnedia/panda-ops` on npm
 - GitHub Action available as `omnedia/panda-ops@v1`
 - License: MIT
 - Author: Omnedia
-

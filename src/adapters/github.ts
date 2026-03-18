@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { AppConfig, VCSAdapter } from '../config.js';
 
 export class GitHubAdapter implements VCSAdapter {

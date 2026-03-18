@@ -98,10 +98,7 @@ export interface VCSAdapter {
   getPullRequestMetadata?(): Promise<{ title: string; author?: string }>;
 }
 
-export function loadConfig(
-  env: NodeJS.ProcessEnv,
-  cli: Partial<PandaOpsConfig>,
-): PandaOpsConfig {
+export function loadConfig(env: NodeJS.ProcessEnv, cli: Partial<PandaOpsConfig>): PandaOpsConfig {
   const merged = {
     provider: cli.provider || env.PROVIDER || 'github',
     repository: cli.repository || env.GITHUB_REPOSITORY || '',
@@ -120,20 +117,15 @@ export function loadConfig(
     aiEnabled: cli.aiEnabled ?? env.AI_ENABLED !== 'false',
     maxComments: cli.maxComments ?? Number(env.MAX_COMMENTS ?? 50),
 
-    focusErrors:
-      cli.focusErrors !== undefined ? cli.focusErrors : env.AI_FOCUS_ERRORS !== 'false',
+    focusErrors: cli.focusErrors !== undefined ? cli.focusErrors : env.AI_FOCUS_ERRORS !== 'false',
 
-    focusWarn:
-      cli.focusWarn !== undefined ? cli.focusWarn : env.AI_FOCUS_WARN !== 'false',
+    focusWarn: cli.focusWarn !== undefined ? cli.focusWarn : env.AI_FOCUS_WARN !== 'false',
 
-    focusTips:
-      cli.focusTips !== undefined ? cli.focusTips : env.AI_FOCUS_TIPS !== 'false',
+    focusTips: cli.focusTips !== undefined ? cli.focusTips : env.AI_FOCUS_TIPS !== 'false',
 
-    focusNotes:
-      cli.focusNotes !== undefined ? cli.focusNotes : env.AI_FOCUS_NOTES === 'true',
+    focusNotes: cli.focusNotes !== undefined ? cli.focusNotes : env.AI_FOCUS_NOTES === 'true',
 
-    focusGrammar:
-      cli.focusGrammar !== undefined ? cli.focusGrammar : env.AI_FOCUS_GRAMMAR === 'true',
+    focusGrammar: cli.focusGrammar !== undefined ? cli.focusGrammar : env.AI_FOCUS_GRAMMAR === 'true',
   };
 
   return ConfigSchema.parse(merged);

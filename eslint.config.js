@@ -1,6 +1,6 @@
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
@@ -20,19 +20,13 @@ export default [
       },
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',
       'no-debugger': 'error',
       'prefer-const': 'warn',
       'no-var': 'error',
-      '@typescript-eslint/ban-ts-comment': [
-        'warn',
-        { 'ts-expect-error': 'allow-with-description' },
-      ],
+      '@typescript-eslint/ban-ts-comment': ['warn', { 'ts-expect-error': 'allow-with-description' }],
     },
   },
 ];

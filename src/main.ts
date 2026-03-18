@@ -1,15 +1,17 @@
 #!/usr/bin/env node
-import { AppConfig, loadConfig, PandaOpsConfig, VCSAdapter } from './config.js';
-import { GitHubAdapter } from './adapters/github.js';
-import { BitbucketAdapter } from './adapters/bitbucket.js';
-import { AzureAdapter } from './adapters/azure.js';
-import { fetchDiff } from './core/diffFetcher.js';
-import { runReview } from './core/reviewEngine.js';
-import { formatSummaryCLI, postReview } from './core/commentPoster.js';
 import { Command } from 'commander';
 import dotenv from 'dotenv';
+
 import { ZodError } from 'zod';
+
+import { AzureAdapter } from './adapters/azure.js';
+import { BitbucketAdapter } from './adapters/bitbucket.js';
+import { GitHubAdapter } from './adapters/github.js';
+import { AppConfig, PandaOpsConfig, VCSAdapter, loadConfig } from './config.js';
+import { formatSummaryCLI, postReview } from './core/commentPoster.js';
+import { fetchDiff } from './core/diffFetcher.js';
 import { log } from './core/logger.js';
+import { runReview } from './core/reviewEngine.js';
 
 dotenv.config();
 
@@ -51,8 +53,7 @@ async function execute(cfg: PandaOpsConfig) {
       log.info(review.summary);
 
       for (const c of review.comments) {
-        const location =
-          c.file && typeof c.line === 'number' ? `${c.file}:${c.line}` : '(no location)';
+        const location = c.file && typeof c.line === 'number' ? `${c.file}:${c.line}` : '(no location)';
         log.info(`- ${location} ${c.message}`);
       }
 
@@ -83,9 +84,7 @@ async function execute(cfg: PandaOpsConfig) {
     }
 
     if (cfg.failOnComments && review.comments.length > 0) {
-      log.warn(
-        '[PandaOps] Comments found — exiting with code 2 (--fail-on-comments enabled)',
-      );
+      log.warn('[PandaOps] Comments found — exiting with code 2 (--fail-on-comments enabled)');
       process.exitCode = 2;
     }
   } catch (err: any) {
@@ -100,10 +99,7 @@ async function main(argv: string[]) {
     .name('panda-ops')
     .description('AI-powered PR review tool for GitHub, Bitbucket, and Azure DevOps')
     .option('-p, --provider <name>', 'Provider (github|bitbucket|azure)')
-    .option(
-      '-r, --repository <repo>',
-      'Repository identifier (owner/name or project/repo)',
-    )
+    .option('-r, --repository <repo>', 'Repository identifier (owner/name or project/repo)')
     .option('-i, --pull-request-id <id>', 'Pull Request ID')
     .option('-t, --token <token>', 'Auth Token / PAT')
     .option('--api-base <url>', 'Base URL override for API')

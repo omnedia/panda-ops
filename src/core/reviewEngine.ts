@@ -1,12 +1,8 @@
-import {
-  PandaOpsConfig,
-  ReviewComment,
-  ReviewResponseSchema,
-  ReviewResult,
-} from '../config.js';
-import { log } from './logger.js';
 import { OpenAI } from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
+
+import { PandaOpsConfig, ReviewComment, ReviewResponseSchema, ReviewResult } from '../config.js';
+import { log } from './logger.js';
 
 // ---------- Heuristic Rules ----------
 function runHeuristic(diff: string): {
@@ -18,8 +14,7 @@ function runHeuristic(diff: string): {
   let addedLines = 0;
 
   for (const line of lines) {
-    if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('diff '))
-      continue;
+    if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('diff ')) continue;
     if (line.startsWith('+')) {
       addedLines++;
       const content = line.slice(1);
@@ -32,9 +27,7 @@ function runHeuristic(diff: string): {
       }
       if (/console\.log/.test(content)) {
         comments.push({
-          message:
-            'console.log found – remove or replace with a proper logger: ' +
-            content.trim(),
+          message: 'console.log found – remove or replace with a proper logger: ' + content.trim(),
           source: 'heuristic',
         });
       }
@@ -80,10 +73,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   const openai = new OpenAI({ apiKey: openaiApiKey });
 
   const MAX_DIFF_CHARS = 60_000;
-  const trimmedDiff =
-    diff.length > MAX_DIFF_CHARS
-      ? diff.slice(0, MAX_DIFF_CHARS) + '\n... [Diff truncated]'
-      : diff;
+  const trimmedDiff = diff.length > MAX_DIFF_CHARS ? diff.slice(0, MAX_DIFF_CHARS) + '\n... [Diff truncated]' : diff;
 
   // --- Build behavior prompt ---
   const focusInstructions: string[] = [];
@@ -103,9 +93,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   }
 
   if (focusTips) {
-    focusInstructions.push(
-      '[TIP] – Readability, maintainability, testability, or minor performance improvements.',
-    );
+    focusInstructions.push('[TIP] – Readability, maintainability, testability, or minor performance improvements.');
   }
 
   if (focusNotes) {
@@ -117,9 +105,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   }
 
   const focusText = focusInstructions.length
-    ? `Only check the code for these focus types:\n${focusInstructions.join(
-        '\n',
-      )}\nBe concise and practical.`
+    ? `Only check the code for these focus types:\n${focusInstructions.join('\n')}\nBe concise and practical.`
     : 'Focus only on clear, actionable code issues.';
 
   const systemPrompt = [
@@ -212,17 +198,12 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   } catch (err: any) {
     log.debug(err, 'AI structured review failed');
     process.exitCode = 1;
-    throw new Error(
-      `AI review failed: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    throw new Error(`AI review failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
 // ---------- Combined Review ----------
-export async function runReview(
-  diff: string,
-  cfg: PandaOpsConfig,
-): Promise<ReviewResult> {
+export async function runReview(diff: string, cfg: PandaOpsConfig): Promise<ReviewResult> {
   const heuristic = runHeuristic(diff);
   let aiComments: ReviewComment[] = [];
   let aiUsed = false;
