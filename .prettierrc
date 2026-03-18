@@ -1,10 +1,35 @@
 {
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
   "semi": true,
   "singleQuote": true,
   "trailingComma": "all",
-  "printWidth": 90,
-  "tabWidth": 2,
   "arrowParens": "always",
-  "bracketSpacing": true,
-  "endOfLine": "lf"
+  "endOfLine": "auto",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "ignore",
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "^node:(.*)$",
+    "^(commander|dotenv)",
+    "^(openai|axios)",
+    "^(zod)",
+    "^(pino)",
+    "",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "options": {
+        "importOrderParserPlugins": ["typescript"]
+      }
+    }
+  ]
 }
