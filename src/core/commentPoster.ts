@@ -4,11 +4,11 @@ import { log } from './logger.js';
 function summarizeResult(result: ReviewResult, cfg: PandaOpsConfig) {
   const { comments, rawDiffStats, aiUsed } = result;
 
-  const errors = comments.filter((c) => /\[ERROR\]/i.test(c.message)).length;
-  const warns = comments.filter((c) => /\[WARN\]/i.test(c.message)).length;
-  const tips = comments.filter((c) => /\[TIP\]/i.test(c.message)).length;
-  const notes = comments.filter((c) => /\[NOTE\]/i.test(c.message)).length;
-  const grammar = comments.filter((c) => /\[GRAMMAR\]/i.test(c.message)).length;
+  const errors = comments.filter((c) => /\[ERROR]/i.test(c.message)).length;
+  const warns = comments.filter((c) => /\[WARN]/i.test(c.message)).length;
+  const tips = comments.filter((c) => /\[TIP]/i.test(c.message)).length;
+  const notes = comments.filter((c) => /\[NOTE]/i.test(c.message)).length;
+  const grammar = comments.filter((c) => /\[GRAMMAR]/i.test(c.message)).length;
   const total = comments.length;
 
   const hasErrors = errors > 0;
@@ -107,9 +107,9 @@ export async function postReview(adapter: VCSAdapter, result: ReviewResult, cfg:
 
 function beautifyTagPrefix(message: string): string {
   return message
-    .replace(/^\[ERROR\]/i, '**[❌]**')
-    .replace(/^\[WARN\]/i, '**[⚠️]**')
-    .replace(/^\[TIP\]/i, '**[💡]**')
-    .replace(/^\[NOTE\]/i, '**[📝]**')
-    .replace(/^\[GRAMMAR\]/i, '**[✏️]**');
+    .replace(/^\[ERROR]/i, '**[❌]**')
+    .replace(/^\[WARN]/i, '**[⚠️]**')
+    .replace(/^\[TIP]/i, '**[💡]**')
+    .replace(/^\[NOTE]/i, '**[📝]**')
+    .replace(/^\[GRAMMAR]/i, '**[✏️]**');
 }

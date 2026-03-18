@@ -65,8 +65,8 @@ async function execute(cfg: PandaOpsConfig) {
       log.info('[PandaOps] Review successfully posted.');
 
       if (adapter.setReviewStatus) {
-        const hasErrors = review.comments.some((c) => /\[ERROR\]/i.test(c.message));
-        const hasWarns = review.comments.some((c) => /\[WARN\]/i.test(c.message));
+        const hasErrors = review.comments.some((c) => /\[ERROR]/i.test(c.message));
+        const hasWarns = review.comments.some((c) => /\[WARN]/i.test(c.message));
         const status =
           cfg.failOnWarnings && (hasErrors || hasWarns)
             ? 'CHANGES_REQUESTED'
