@@ -55,9 +55,9 @@ Required by change type:
 
 - TypeScript source: `npm run build` and `npm run lint`
 - CLI option/config/env behavior: `npm run build` and `npm run lint`
-- GitHub Action metadata or workflow YAML: `npm run prettier:check`
-- Markdown/docs: `npm run prettier:check`
-- Package/dependency changes: `npm run build`, `npm run lint`, and `npm run prettier:check`
+- GitHub Action metadata or workflow YAML: `npm run format:fix`
+- Markdown/docs: `npm run format:fix`
+- Package/dependency changes: `npm run build`, `npm run lint`, and `npm run format:fix`
 - AI prompt/schema behavior: `npm run build` and `npm run lint`
 - Provider adapter behavior: `npm run build` and `npm run lint`
 
