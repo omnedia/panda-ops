@@ -38,9 +38,6 @@ inputs:
   fail_on_warnings:
     description: 'Request changes if warnings/errors found'
     required: false
-  ai_enabled:
-    description: 'Enable or disable AI analysis'
-    required: false
   max_comments:
     description: 'Maximum number of comments to post'
     default: '50'
@@ -94,7 +91,6 @@ runs:
         OPENAI_API_KEY: ${{ inputs.openai_api_key }}
         OPENAI_MODEL: ${{ inputs.openai_model }}
         OPENAI_TEMPERATURE: ${{ inputs.openai_temperature }}
-        AI_ENABLED: ${{ inputs.ai_enabled }}
         MAX_COMMENTS: ${{ inputs.max_comments }}
         DRY_RUN: ${{ inputs.dry_run }}
         OUTPUT_JSON: ${{ inputs.output_json }}

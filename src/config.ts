@@ -14,7 +14,6 @@ export interface AIConfig {
   openaiApiKey: string;
   openaiModel: string;
   openaiTemperature: number;
-  aiEnabled: boolean;
   maxComments: number;
 }
 
@@ -46,7 +45,6 @@ export const ConfigSchema = z.object({
   openaiApiKey: z.string().min(1, 'OpenAI API key missing').default(''),
   openaiModel: z.string().default('gpt-5-mini'),
   openaiTemperature: z.number().default(1),
-  aiEnabled: z.boolean().default(true),
   maxComments: z.number().default(50),
 
   focusErrors: z.boolean().default(true),
@@ -56,7 +54,7 @@ export const ConfigSchema = z.object({
   focusGrammar: z.boolean().default(false),
 });
 
-export type ReviewSource = 'heuristic' | 'ai';
+export type ReviewSource = 'ai';
 
 export interface ReviewComment {
   file?: string;
@@ -69,7 +67,6 @@ export interface ReviewResult {
   comments: ReviewComment[];
   summary: string;
   rawDiffStats: { addedLines: number; totalLines: number };
-  aiUsed: boolean;
 }
 
 export const ReviewResponseSchema = z.object({
@@ -114,7 +111,6 @@ export function loadConfig(env: NodeJS.ProcessEnv, cli: Partial<PandaOpsConfig>)
     openaiApiKey: cli.openaiApiKey || env.OPENAI_API_KEY || '',
     openaiModel: cli.openaiModel || env.OPENAI_MODEL || 'gpt-5-mini',
     openaiTemperature: cli.openaiTemperature ?? Number(env.OPENAI_TEMPERATURE ?? 1),
-    aiEnabled: cli.aiEnabled ?? env.AI_ENABLED !== 'false',
     maxComments: cli.maxComments ?? Number(env.MAX_COMMENTS ?? 50),
 
     focusErrors: cli.focusErrors !== undefined ? cli.focusErrors : env.AI_FOCUS_ERRORS !== 'false',

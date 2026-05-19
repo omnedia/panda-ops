@@ -1,8 +1,7 @@
 # 🐼 PandaOps — AI-Powered Pull Request Reviewer
 
-**PandaOps** is a TypeScript-based CLI tool that automatically analyzes Pull Requests using heuristics and AI (via
-OpenAI models). It fetches PR diffs, runs intelligent reviews, and posts actionable feedback directly to GitHub,
-Bitbucket, or Azure DevOps.
+**PandaOps** is a TypeScript-based CLI tool that automatically analyzes Pull Requests using AI (via OpenAI models). It
+fetches PR diffs, runs intelligent reviews, and posts actionable feedback directly to GitHub, Bitbucket, or Azure DevOps.
 
 ---
 
@@ -10,7 +9,6 @@ Bitbucket, or Azure DevOps.
 
 - **Multi-platform support** — Works with GitHub, Bitbucket, and Azure DevOps.
 - **AI-driven code reviews** — Uses OpenAI models (default: `gpt-5-mini`) to produce clear, concise feedback.
-- **Heuristic scanning** — Detects common issues like TODOs, `console.log`, `debugger`, or large diffs.
 - **Inline and summary comments** — Posts detailed code-level feedback directly to PRs.
 - **Dry-run & JSON output modes** — Preview or integrate with other tools.
 - **Configurable behavior** — Focus AI on errors, warnings, tips, notes, or grammar.
@@ -99,7 +97,6 @@ jobs:
 | `output_json`        | Output machine-readable JSON                  | `false`                                   |
 | `fail_on_comments`   | Exit with code 2 if comments found            | `false`                                   |
 | `fail_on_warnings`   | Request changes if warnings found             | `false`                                   |
-| `ai_enabled`         | Enable AI processing                          | `true`                                    |
 | `max_comments`       | Max number of comments                        | `50`                                      |
 | `openai_model`       | Model name                                    | `gpt-5-mini`                              |
 | `openai_temperature` | Sampling temperature                          | `1`                                       |
@@ -120,7 +117,7 @@ jobs:
 | `--fail-on-comments`     | Exit code 2 if comments found.         |
 | `--fail-on-warnings`     | Mark PR as _Changes Requested_.        |
 | `--openai-model <model>` | Specify model (default: `gpt-5-mini`). |
-| `--max-comments <n>`     | Limit total AI + heuristic comments.   |
+| `--max-comments <n>`     | Limit total AI comments.               |
 
 ---
 
@@ -131,7 +128,7 @@ src/
 ├── main.ts              # CLI entrypoint
 ├── config.ts            # Configuration and schema validation
 ├── core/
-│   ├── reviewEngine.ts  # AI + heuristic analysis logic
+│   ├── reviewEngine.ts  # AI review logic
 │   ├── diffFetcher.ts   # Unified diff retrieval
 │   ├── commentPoster.ts # Review posting logic
 │   └── logger.ts        # Pino-based logging
@@ -189,13 +186,13 @@ For GitHub, recommended scopes:
 
 ```
 [PandaOps] --- DRY RUN ---
-Comments: 5 (Heuristic 2 + AI 3)
+Comments: 3 (AI 3)
 
 - src/app.ts:24 [ERROR] Missing null check for user input.
 - src/utils/db.ts:10 [WARN] Missing transaction rollback on error.
 - src/routes/api.ts:3 [TIP] Avoid using console.log in production.
 
-✅ Summary: 5 issues detected — review before merging.
+✅ Summary: 3 issues detected — review before merging.
 ```
 
 ---

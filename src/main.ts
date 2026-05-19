@@ -43,7 +43,6 @@ async function execute(cfg: PandaOpsConfig) {
         summary: review.summary,
         comments: review.comments,
         stats: review.rawDiffStats,
-        aiUsed: review.aiUsed,
         provider: cfg.provider,
         pullRequestId: cfg.pullRequestId,
       };
@@ -111,7 +110,6 @@ async function main(argv: string[]) {
     .option('--openai-model <model>', 'OpenAI model', 'gpt-5-mini')
     .option('--openai-temperature <num>', 'OpenAI temperature', (v) => Number(v), 1)
     .option('--openai-max-tokens <num>', 'OpenAI max tokens', (v) => Number(v), 1500)
-    .option('--no-ai', 'Disable AI processing')
     .option('--max-comments <num>', 'Maximum number of comments', (v) => Number(v), 50)
     .parse(argv);
 
@@ -130,7 +128,6 @@ async function main(argv: string[]) {
       openaiApiKey: opts.openaiApiKey,
       openaiModel: opts.openaiModel,
       openaiTemperature: opts.openaiTemperature,
-      aiEnabled: !opts.noAi,
       maxComments: opts.maxComments,
     });
 

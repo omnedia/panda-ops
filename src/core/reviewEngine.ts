@@ -4,57 +4,21 @@ import { zodResponseFormat } from 'openai/helpers/zod';
 import { PandaOpsConfig, ReviewComment, ReviewResponseSchema, ReviewResult } from '../config.js';
 import { log } from './logger.js';
 
-// ---------- Heuristic Rules ----------
-function runHeuristic(diff: string): {
-  comments: ReviewComment[];
+function getDiffStats(diff: string): {
   addedLines: number;
+  totalLines: number;
 } {
   const lines = diff.split(/\r?\n/);
-  const comments: ReviewComment[] = [];
   let addedLines = 0;
 
   for (const line of lines) {
     if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('diff ')) continue;
     if (line.startsWith('+')) {
       addedLines++;
-      const content = line.slice(1);
-
-      if (/TODO/i.test(content)) {
-        comments.push({
-          message: 'Avoid TODOs in production code: ' + content.trim(),
-          source: 'heuristic',
-        });
-      }
-      if (/console\.log/.test(content)) {
-        comments.push({
-          message: 'console.log found – remove or replace with a proper logger: ' + content.trim(),
-          source: 'heuristic',
-        });
-      }
-      if (/debugger;?/.test(content)) {
-        comments.push({
-          message: 'debugger statement found – remove before merge.',
-          source: 'heuristic',
-        });
-      }
-
-      if (/\bany\b/.test(content)) {
-        comments.push({
-          message: "TypeScript 'any' used — prefer explicit types.",
-          source: 'heuristic',
-        });
-      }
     }
   }
 
-  if (addedLines > 500) {
-    comments.push({
-      message: `Large diff with ${addedLines} added lines – consider splitting into smaller PRs.`,
-      source: 'heuristic',
-    });
-  }
-
-  return { comments, addedLines };
+  return { addedLines, totalLines: lines.length };
 }
 
 // ---------- AI Review ----------
@@ -79,7 +43,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   const focusInstructions: string[] = [];
   if (focusErrors) {
     focusInstructions.push(
-      '[ERROR] – Security vulnerabilities (injection, unsafe eval, unvalidated input), ' +
+      '[ERROR] - Security vulnerabilities (injection, unsafe eval, unvalidated input), ' +
         'syntax errors, build/runtime breaking logic, incorrect conditions, or any code ' +
         'that will cause crashes or incorrect results.',
     );
@@ -87,21 +51,21 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
 
   if (focusWarn) {
     focusInstructions.push(
-      '[WARN] – Potential problems that may not fail immediately: performance issues, ' +
+      '[WARN] - Potential problems that may not fail immediately: performance issues, ' +
         'concurrency risks, missing error handling, data leaks, weak validation, or bad UX implications.',
     );
   }
 
   if (focusTips) {
-    focusInstructions.push('[TIP] – Readability, maintainability, testability, or minor performance improvements.');
+    focusInstructions.push('[TIP] - Readability, maintainability, testability, or minor performance improvements.');
   }
 
   if (focusNotes) {
-    focusInstructions.push('[NOTE] – Broader architectural or design feedback.');
+    focusInstructions.push('[NOTE] - Broader architectural or design feedback.');
   }
 
   if (focusGrammar) {
-    focusInstructions.push('[GRAMMAR] – Grammar, spelling, or naming consistency.');
+    focusInstructions.push('[GRAMMAR] - Grammar, spelling, or naming consistency.');
   }
 
   const focusText = focusInstructions.length
@@ -126,7 +90,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
     'Treat security, correctness, and logic problems as highest priority.',
     '',
     'Each comment must be **precise, standalone, and actionable**.',
-    'Keep every comment short and focused — ideally one or two sentences.',
+    'Keep every comment short and focused - ideally one or two sentences.',
     'Use direct, reviewer-style phrasing (like real code review feedback).',
     'Prefer commands or short recommendations over long explanations.',
     "For example: instead of 'Recommend using...', write 'Use smaller default size (e.g. 1000x800) to fit common screens.'",
@@ -155,7 +119,7 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   const userPrompt = [
     'Analyze the following Git diff carefully.',
     'Find every applicable issue based on the above focus rules.',
-    'Be strict but fair — assume this is a production PR about to be merged.',
+    'Be strict but fair - assume this is a production PR about to be merged.',
     'Write concise, professional review comments. Avoid repetition or lengthy justification.',
     'Each message should be readable in a code review UI at a glance.',
     '',
@@ -198,39 +162,21 @@ async function runAI(diff: string, cfg: PandaOpsConfig): Promise<ReviewComment[]
   } catch (err: any) {
     log.debug(err, 'AI structured review failed');
     process.exitCode = 1;
-    throw new Error(`AI review failed: ${err instanceof Error ? err.message : String(err)}`);
+    throw new Error(`AI review failed: ${err instanceof Error ? err.message : String(err)}`, { cause: err });
   }
 }
 
 // ---------- Combined Review ----------
 export async function runReview(diff: string, cfg: PandaOpsConfig): Promise<ReviewResult> {
-  const heuristic = runHeuristic(diff);
-  let aiComments: ReviewComment[] = [];
-  let aiUsed = false;
+  const rawDiffStats = getDiffStats(diff);
+  const aiComments = await runAI(diff, cfg);
 
-  if (cfg.aiEnabled) {
-    aiComments = await runAI(diff, cfg);
-    aiUsed = true;
-  }
-
-  const merged = [...heuristic.comments];
-  for (const c of aiComments) {
-    if (!merged.some((m) => m.message === c.message)) merged.push(c);
-  }
-
-  const limited = merged.slice(0, cfg.maxComments);
-
-  const summary = `Comments: ${limited.length} (Heuristic ${heuristic.comments.length}${
-    aiUsed ? ` + AI ${aiComments.length}` : ''
-  })`;
+  const limited = aiComments.slice(0, cfg.maxComments);
+  const summary = `Comments: ${limited.length} (AI ${aiComments.length})`;
 
   return {
     comments: limited,
     summary,
-    rawDiffStats: {
-      addedLines: heuristic.addedLines,
-      totalLines: diff.split(/\r?\n/).length,
-    },
-    aiUsed,
+    rawDiffStats,
   };
 }

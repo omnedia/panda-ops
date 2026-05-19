@@ -2,7 +2,7 @@ import { PandaOpsConfig, ReviewResult, VCSAdapter } from '../config.js';
 import { log } from './logger.js';
 
 function summarizeResult(result: ReviewResult, cfg: PandaOpsConfig) {
-  const { comments, rawDiffStats, aiUsed } = result;
+  const { comments, rawDiffStats } = result;
 
   const errors = comments.filter((c) => /\[ERROR]/i.test(c.message)).length;
   const warns = comments.filter((c) => /\[WARN]/i.test(c.message)).length;
@@ -26,7 +26,6 @@ function summarizeResult(result: ReviewResult, cfg: PandaOpsConfig) {
     notes,
     grammar,
     addedLines: rawDiffStats.addedLines,
-    aiUsed,
     status,
     hasIssues,
   };
@@ -61,7 +60,6 @@ export function formatSummaryCLI(result: ReviewResult, cfg: PandaOpsConfig): str
         ----------------------------------------
         No issues found — looks great!
         Lines added: ${stats.addedLines}
-        AI Used: ${stats.aiUsed ? 'Yes' : 'No'}
         Status: APPROVED
         `;
   }
@@ -76,7 +74,6 @@ export function formatSummaryCLI(result: ReviewResult, cfg: PandaOpsConfig): str
     Notes: ${stats.notes}
     Grammar: ${stats.grammar}
     Lines added: ${stats.addedLines}
-    AI Used: ${stats.aiUsed ? 'Yes' : 'No'}
     Status: ${stats.status}
     `;
 }
