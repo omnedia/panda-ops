@@ -1,0 +1,119 @@
+guidelines_root: .github/guidelines
+
+defaults:
+  source_change:
+    - typescript.md
+  documentation_change:
+    - docs.md
+  verification:
+    - testing-verification.md
+
+routes:
+  - patterns:
+      - 'src/**/*.ts'
+    guidelines:
+      - typescript.md
+      - node-cli.md
+
+  - patterns:
+      - 'src/main.ts'
+    guidelines:
+      - typescript.md
+      - node-cli.md
+      - config.md
+
+  - patterns:
+      - 'src/config.ts'
+    guidelines:
+      - typescript.md
+      - config.md
+      - security.md
+
+  - patterns:
+      - 'src/core/reviewEngine.ts'
+    guidelines:
+      - typescript.md
+      - ai-review.md
+      - security.md
+
+  - patterns:
+      - 'src/core/commentPoster.ts'
+    guidelines:
+      - typescript.md
+      - ai-review.md
+      - vcs-adapters.md
+
+  - patterns:
+      - 'src/core/logger.ts'
+    guidelines:
+      - typescript.md
+      - security.md
+
+  - patterns:
+      - 'src/adapters/**/*.ts'
+    guidelines:
+      - typescript.md
+      - vcs-adapters.md
+      - security.md
+
+  - patterns:
+      - 'action.yml'
+    guidelines:
+      - github-action.md
+      - config.md
+      - docs.md
+
+  - patterns:
+      - '.github/workflows/**/*.yml'
+      - '.github/workflows/**/*.yaml'
+    guidelines:
+      - github-action.md
+      - testing-verification.md
+
+  - patterns:
+      - '.github/**/*.md'
+      - 'README.md'
+    guidelines:
+      - docs.md
+      - testing-verification.md
+
+  - patterns:
+      - 'package.json'
+      - 'package-lock.json'
+    guidelines:
+      - node-cli.md
+      - testing-verification.md
+
+  - patterns:
+      - '.prettierrc'
+      - 'eslint.config.js'
+      - 'tsconfig.json'
+    guidelines:
+      - typescript.md
+      - testing-verification.md
+
+concerns:
+  cli_config_env:
+    guidelines:
+      - config.md
+      - node-cli.md
+      - docs.md
+  github_action:
+    guidelines:
+      - github-action.md
+      - config.md
+      - docs.md
+  openai_review:
+    guidelines:
+      - ai-review.md
+      - security.md
+  vcs_provider:
+    guidelines:
+      - vcs-adapters.md
+      - security.md
+  security:
+    guidelines:
+      - security.md
+  verification:
+    guidelines:
+      - testing-verification.md
