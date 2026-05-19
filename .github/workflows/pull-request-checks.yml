@@ -2,7 +2,7 @@ name: Pull Request Checks
 
 on:
   pull_request:
-    types: [ opened, synchronize, reopened, ready_for_review ]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -21,8 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [ frontend, backend ]
-        script: [ format, lint ]
+        package: [frontend, backend]
+        script: [format, lint]
 
     defaults:
       run:
@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [ frontend, backend ]
+        package: [frontend, backend]
 
     defaults:
       run:
