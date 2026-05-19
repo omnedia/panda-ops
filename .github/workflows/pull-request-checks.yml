@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         package: [ frontend, backend ]
-        script: [ prettier, lint ]
+        script: [ format, lint ]
 
     defaults:
       run:
